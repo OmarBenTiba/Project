@@ -12,7 +12,8 @@ pipeline {
         stage('Clean & Compile') {
             steps {
                 echo 'Nettoyage et compilation du projet...'
-                bat 'mvnw.cmd clean compile'            }
+                bat 'mvn clean compile'
+            }
         }
 
         stage('Test (optional)') {
