@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'JDK21'
+        maven 'Maven'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -16,14 +21,6 @@ pipeline {
             }
         }
 
-        stage('Test (optional)') {
-            steps {
-                echo 'Execution des tests (si existants)...'
-                // This will NOT fail if no tests exist
-                bat 'mvn test || echo No tests found'
-            }
-        }
-
         stage('Package') {
             steps {
                 echo 'Generation du fichier JAR...'
@@ -33,22 +30,8 @@ pipeline {
 
         stage('Archive Artifact') {
             steps {
-                echo 'Archivage du fichier JAR genere...'
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline execute avec succes.'
-        }
-        failure {
-            echo 'Le pipeline a echoue.'
-        }
-        always {
-            // Will NOT fail if no test reports exist
-            junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
         }
     }
 }
