@@ -12,7 +12,7 @@ pipeline {
         stage('Clean & Compile') {
             steps {
                 echo 'Nettoyage et compilation du projet...'
-                bat 'mvn clean compile'
+                bat 'mvnw.cmd clean compile'
             }
         }
 
