@@ -35,11 +35,21 @@ pipeline {
                 bat 'mvn package -DskipTests'
             }
         }
-        
+
         stage('Build Docker Image') {
     steps {
         echo 'Construction de l image Docker...'
         bat 'docker build -t achat-app .'
+    }
+}
+stage('Run Docker Container') {
+    steps {
+        echo 'Execution du conteneur Docker...'
+        bat '''
+        docker stop achat-container || exit 0
+        docker rm achat-container || exit 0
+        docker run -d -p 8089:8089 --name achat-container achat-app
+        '''
     }
 }
 
