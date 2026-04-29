@@ -35,6 +35,13 @@ pipeline {
                 bat 'mvn package -DskipTests'
             }
         }
+        
+        stage('Build Docker Image') {
+    steps {
+        echo 'Construction de l image Docker...'
+        bat 'docker build -t achat-app .'
+    }
+}
 
         stage('Publish to Nexus') {
     steps {
