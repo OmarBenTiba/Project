@@ -37,30 +37,31 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-    steps {
-        echo 'Construction de l image Docker...'
-        bat 'docker build -t achat-app .'
-    }
-}
-stage('Run Docker Container') {
-    steps {
-        echo 'Execution du conteneur Docker...'
-        bat '''
-        docker stop achat-container || exit 0
-        docker rm achat-container || exit 0
-        docker run -d -p 8089:8089 --name achat-container achat-app
-        '''
-    }
-}
+            steps {
+                echo 'Construction de l image Docker...'
+                bat 'docker build -t achat-app .'
+            }
+        }
+
+        stage('Run Docker Compose') {
+            steps {
+                echo 'Demarrage du stack Docker...'
+                bat '''
+                docker compose down -v || exit 0
+                docker compose up -d
+                docker ps
+                '''
+            }
+        }
 
         stage('Publish to Nexus') {
-    steps {
-        echo 'Publication de l artifact dans Nexus...'
-        configFileProvider([configFile(fileId: 'nexus-settings', variable: 'MAVEN_SETTINGS')]) {
-            bat 'mvn deploy -s %MAVEN_SETTINGS% -DskipTests'
+            steps {
+                echo 'Publication de l artifact dans Nexus...'
+                configFileProvider([configFile(fileId: 'nexus-settings', variable: 'MAVEN_SETTINGS')]) {
+                    bat 'mvn deploy -s %MAVEN_SETTINGS% -DskipTests'
+                }
+            }
         }
-    }
-}
 
         stage('Archive Artifact') {
             steps {
