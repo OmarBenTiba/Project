@@ -43,6 +43,7 @@ pipeline {
             bat 'mvn deploy -s %MAVEN_SETTINGS% -DskipTests'
         }
     }
+}
 
         stage('Archive Artifact') {
             steps {
