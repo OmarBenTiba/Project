@@ -13,6 +13,15 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                echo 'Analyse de la qualite du code avec SonarQube...'
+                withSonarQubeEnv('SonarQube') {
+                    bat 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=achat -Dsonar.projectName=achat'
+                }
+            }
+        }
+
         stage('Clean & Compile') {
             steps {
                 echo 'Nettoyage et compilation du projet...'
