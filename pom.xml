@@ -112,14 +112,17 @@
                     </excludes>
                 </configuration>
             </plugin>
-            
+
             <!-- owasp Boot plugin -->
             <plugin>
-                    <groupId>org.owasp</groupId>
+                <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
-                    <version>9.0.9</version>
+                        <version>9.0.9</version>
+                <configuration>
+                    <failOnError>false</failOnError>
+                        <format>ALL</format>
+                </configuration>
             </plugin>
-
         </plugins>
     </build>
 

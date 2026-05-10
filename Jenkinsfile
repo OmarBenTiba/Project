@@ -19,13 +19,20 @@ pipeline {
                 bat 'mvn clean compile'
             }
         }
-            
+
         stage('SonarQube Analysis') {
             steps {
                 echo 'Analyse de la qualite du code avec SonarQube...'
                 withSonarQubeEnv('SonarQube') {
                     bat 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=achat -Dsonar.projectName=achat'
                 }
+            }
+        }
+
+        stage('OWASP Dependency Check') {
+            steps {
+                echo 'Analyse des vulnerabilites OWASP...'
+                bat 'mvn org.owasp:dependency-check-maven:9.0.9:check -DfailOnError=false'
             }
         }
 
@@ -67,6 +74,7 @@ pipeline {
             steps {
                 echo 'Archivage du fichier JAR genere...'
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                archiveArtifacts artifacts: 'target/dependency-check-report.html', allowEmptyArchive: true
             }
         }
     }
