@@ -50,6 +50,15 @@ pipeline {
             }
         }
 
+        stage('Trivy Security Scan') {
+    steps {
+        echo 'Analyse de securite Docker avec Trivy...'
+        bat '''
+        trivy image --format html --output trivy-report.html achat-app
+        '''
+    }
+}
+
         stage('Run Docker Compose') {
             steps {
                 echo 'Demarrage du stack Docker...'
@@ -75,6 +84,7 @@ pipeline {
                 echo 'Archivage du fichier JAR genere...'
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
                 archiveArtifacts artifacts: 'target/dependency-check-report.html', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'trivy-report.html', allowEmptyArchive: true
             }
         }
     }
