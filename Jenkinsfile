@@ -87,7 +87,7 @@ pipeline {
                 archiveArtifacts artifacts: 'target/dependency-check-report.html', allowEmptyArchive: true
                 archiveArtifacts artifacts: 'trivy-report.txt', allowEmptyArchive: true            }
         }
-    
+    }
 
     post {
         success {
