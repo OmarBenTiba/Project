@@ -54,7 +54,7 @@ pipeline {
     steps {
         echo 'Analyse de securite Docker avec Trivy...'
         bat '''
-        trivy image --format html --output trivy-report.html achat-app
+        trivy image --format json --output trivy-report.html achat-app
         '''
     }
 }
