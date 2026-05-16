@@ -54,10 +54,11 @@ pipeline {
     steps {
         echo 'Analyse de securite Docker avec Trivy...'
         bat '''
-        trivy image --format json --output trivy-report.html achat-app
+        trivy image --exit-code 0 --severity HIGH,CRITICAL --format table --output trivy-report.txt achat-app
         '''
     }
 }
+
 
         stage('Run Docker Compose') {
             steps {
@@ -84,10 +85,9 @@ pipeline {
                 echo 'Archivage du fichier JAR genere...'
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
                 archiveArtifacts artifacts: 'target/dependency-check-report.html', allowEmptyArchive: true
-                archiveArtifacts artifacts: 'trivy-report.html', allowEmptyArchive: true
-            }
+                archiveArtifacts artifacts: 'trivy-report.txt', allowEmptyArchive: true            }
         }
-    }
+    
 
     post {
         success {
