@@ -51,13 +51,15 @@ pipeline {
         }
 
         stage('Trivy Security Scan') {
-            steps {
-                echo 'Analyse de securite Docker avec Trivy...'
-                bat '''
-                trivy image --exit-code 0 --severity HIGH,CRITICAL --format table --output trivy-report.txt achat-app
-                '''
-            }
-        }
+    steps {
+        echo 'Analyse de securite Docker avec Trivy...'
+        bat '''
+        trivy image --exit-code 0 --severity HIGH,CRITICAL --format json --output trivy-report.json achat-app
+
+        powershell -Command "$json = Get-Content trivy-report.json | ConvertFrom-Json; $rows = foreach ($result in $json.Results) { foreach ($vuln in $result.Vulnerabilities) { [PSCustomObject]@{Target=$result.Target; Package=$vuln.PkgName; VulnerabilityID=$vuln.VulnerabilityID; Severity=$vuln.Severity; InstalledVersion=$vuln.InstalledVersion; FixedVersion=$vuln.FixedVersion; Title=$vuln.Title} } }; $rows | ConvertTo-Html -Title 'Trivy Security Report' -PreContent '<h1>Trivy Security Report - achat-app</h1>' | Out-File trivy-report.html"
+        '''
+    }
+}
 
         stage('Run Docker Compose') {
             steps {
@@ -84,7 +86,8 @@ pipeline {
                 echo 'Archivage du fichier JAR genere...'
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
                 archiveArtifacts artifacts: 'target/dependency-check-report.html', allowEmptyArchive: true
-                archiveArtifacts artifacts: 'trivy-report.txt', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'trivy-report.html', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'trivy-report.json', allowEmptyArchive: true
             }
         }
     }
