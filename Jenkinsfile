@@ -74,17 +74,19 @@ pipeline {
 
         stage('OWASP ZAP Scan') {
     steps {
-        echo 'Analyse de securite dynamique avec OWASP ZAP...'
+        echo 'Analyse de sécurité dynamique avec OWASP ZAP...'
 
-        bat '''
+        bat """
         docker run --rm ^
           -v %cd%:/zap/wrk/:rw ^
           ghcr.io/zaproxy/zaproxy:stable ^
           zap-baseline.py ^
           -t http://host.docker.internal:8089/SpringMVC ^
-          -r zap-report.html
-        '''
+          -r zap-report.html ^
+          -I
+        """
     }
+}
 }
 
         stage('Publish to Nexus') {
