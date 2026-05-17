@@ -72,6 +72,21 @@ pipeline {
             }
         }
 
+        stage('OWASP ZAP Scan') {
+    steps {
+        echo 'Analyse de securite dynamique avec OWASP ZAP...'
+
+        bat '''
+        docker run --rm ^
+          -v %cd%:/zap/wrk/:rw ^
+          ghcr.io/zaproxy/zaproxy:stable ^
+          zap-baseline.py ^
+          -t http://host.docker.internal:8089/SpringMVC ^
+          -r zap-report.html
+        '''
+    }
+}
+
         stage('Publish to Nexus') {
             steps {
                 echo 'Publication de l artifact dans Nexus...'
@@ -88,6 +103,7 @@ pipeline {
                 archiveArtifacts artifacts: 'target/dependency-check-report.html', allowEmptyArchive: true
                 archiveArtifacts artifacts: 'trivy-report.html', allowEmptyArchive: true
                 archiveArtifacts artifacts: 'trivy-report.json', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'zap-report.html', allowEmptyArchive: true
             }
         }
     }
