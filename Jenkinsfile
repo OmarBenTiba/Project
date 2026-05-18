@@ -90,8 +90,15 @@ stage('OWASP ZAP Scan') {
 
         stage('Publish to Nexus') {
     steps {
-        configFileProvider([configFile(fileId: 'nexus-settings', variable: 'MAVEN_SETTINGS')]) {
-            bat 'mvn deploy -s %MAVEN_SETTINGS% -DskipTests -e -X 2>&1 | findstr /i "400\\|ERROR\\|WARN\\|nexus\\|repository"'
+        dir('achat') {
+            configFileProvider([
+                    configFile(
+                            fileId: '96c23311-fbc7-4aa0-a4c4-bc0686d66999',
+                            variable: 'MAVEN_SETTINGS'
+                    )
+            ]) {
+                bat 'mvn deploy -s %MAVEN_SETTINGS% -DskipTests'
+            }
         }
     }
 }
