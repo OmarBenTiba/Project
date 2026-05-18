@@ -86,41 +86,33 @@ stage('OWASP ZAP Scan') {
         '''
     }
 }
-
-
         stage('Publish to Nexus') {
-    steps {
-        dir('achat') {
-            configFileProvider([
-                    configFile(
-                            fileId: '96c23311-fbc7-4aa0-a4c4-bc0686d66999',
-                            variable: 'MAVEN_SETTINGS'
-                    )
-            ]) {
-                bat 'mvn deploy -s %MAVEN_SETTINGS% -DskipTests'
-            }
-        }
-    }
-}
-
-        stage('Archive Artifact') {
             steps {
-                echo 'Archivage du fichier JAR genere...'
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-                archiveArtifacts artifacts: 'target/dependency-check-report.html', allowEmptyArchive: true
-                archiveArtifacts artifacts: 'trivy-report.html', allowEmptyArchive: true
-                archiveArtifacts artifacts: 'trivy-report.json', allowEmptyArchive: true
-                archiveArtifacts artifacts: 'zap-report.html', allowEmptyArchive: true
+                echo 'Publication de l artifact dans Nexus...'
+                configFileProvider([configFile(fileId: 'nexus-settings', variable: 'MAVEN_SETTINGS')]) {
+                    bat 'mvn deploy -s %MAVEN_SETTINGS% -DskipTests'
+                }
             }
         }
     }
 
     post {
+        always {
+            echo 'Archivage des rapports et artifacts...'
+            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true, allowEmptyArchive: true
+            archiveArtifacts artifacts: 'target/dependency-check-report.html', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'trivy-report.html', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'trivy-report.json', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'zap-report.html', allowEmptyArchive: true
+        }
+
         success {
             echo 'Pipeline execute avec succes.'
         }
+
         failure {
             echo 'Le pipeline a echoue.'
         }
     }
 }
+
