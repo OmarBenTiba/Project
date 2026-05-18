@@ -89,13 +89,12 @@ stage('OWASP ZAP Scan') {
 
 
         stage('Publish to Nexus') {
-            steps {
-                echo 'Publication de l artifact dans Nexus...'
-                configFileProvider([configFile(fileId: 'nexus-settings', variable: 'MAVEN_SETTINGS')]) {
-                    bat 'mvn deploy -s %MAVEN_SETTINGS% -DskipTests'
-                }
-            }
+    steps {
+        configFileProvider([configFile(fileId: 'nexus-settings', variable: 'MAVEN_SETTINGS')]) {
+            bat 'mvn deploy -s %MAVEN_SETTINGS% -DskipTests -e -X 2>&1 | findstr /i "400\\|ERROR\\|WARN\\|nexus\\|repository"'
         }
+    }
+}
 
         stage('Archive Artifact') {
             steps {
